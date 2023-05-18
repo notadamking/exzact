@@ -1,23 +1,30 @@
-import { z } from "zod";
+import { z } from "zod"
 
-import { zapp } from "../src/app";
-import { logMiddleware } from "./middleware/log.middleware";
+import { zapp } from "../src/exzact"
+import { logMiddleware } from "./middleware/log.middleware"
 
-const app = zapp();
+interface Context {
+  stuff: string
+}
 
-app.use(logMiddleware);
+const app = zapp<Context>()
+
+app.use(logMiddleware)
 
 export const hello = app.zact(z.object({ stuff: z.string().min(1) }))(
   async ({ stuff }: { stuff: string }) => {
-    console.log(`Hello ${stuff}`);
+    console.log(`Hello ${stuff}`)
+  },
+  {
+    stuff: "",
   }
-);
+)
 
 async function main() {
-  await hello({ stuff: "world" });
+  await hello({ stuff: "world" })
 
-  console.log("");
-  console.log("✅ Example completed successfully.");
+  console.log("")
+  console.log("✅ Example completed successfully.")
 }
 
-main();
+main()

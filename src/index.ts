@@ -1,2 +1,1 @@
-export * from "./app";
-export * from "./server.d";
+export * from "./exzact"

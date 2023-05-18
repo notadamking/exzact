@@ -1,28 +1,28 @@
-import { z } from "zod";
+import { z } from "zod"
 
-import { zapp } from "../src/app";
-import { localRateLimitMiddleware } from "./middleware/localRateLimit.preware";
+import { zapp } from "../src/exzact"
+import { localRateLimitMiddleware } from "./middleware/localRateLimit.middleware"
 
-const app = zapp();
+const app = zapp()
 
-app.use(localRateLimitMiddleware);
+app.use(localRateLimitMiddleware)
 
 export const expensive = app.zact(z.object({ stuff: z.string().min(1) }))(
   async ({ stuff }: { stuff: string }) => {
-    console.log(`[Expensive]: Hello ${stuff}`);
+    console.log(`[Expensive]: Hello ${stuff}`)
   }
-);
+)
 
 async function main() {
   try {
-    await expensive({ stuff: "world" });
-    await expensive({ stuff: "blocked" });
+    await expensive({ stuff: "world" })
+    await expensive({ stuff: "blocked" })
   } catch (err) {
-    console.error(err);
+    console.error(err)
   }
 
-  console.log("");
-  console.log("✅ Example completed successfully.");
+  console.log("")
+  console.log("✅ Example completed successfully.")
 }
 
-main();
+main()
