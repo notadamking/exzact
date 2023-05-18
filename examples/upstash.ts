@@ -11,15 +11,15 @@ import "cross-fetch/polyfill"
 
 dotenv.config()
 
-import { zapp } from "../src/exzact"
+import { exzact } from "../src/exzact"
 import { upstashMiddleware } from "./middleware/upstash.middleware"
 
-const app = zapp()
+const app = exzact()
 
 app.use(upstashMiddleware)
 
 export const expensive = app.zact(z.object({ stuff: z.string().min(1) }))(
-  async ({ stuff }: { stuff: string }) => {
+  async ({ stuff }) => {
     console.log(`[Expensive]: Hello ${stuff}`)
   }
 )

@@ -4,8 +4,10 @@ import type z from "zod"
 import { fromZodError } from "zod-validation-error"
 import { ZactAction } from "zact/server"
 
-export function zapp<ContextType extends object | undefined = any>() {
-  return new ZactApp<ContextType>()
+export function exzact<ContextType extends object | undefined = any>(
+  defaultContext: ContextType = {} as ContextType
+) {
+  return new Exzact<ContextType>(defaultContext)
 }
 
 export enum MiddlewareStage {
@@ -31,14 +33,22 @@ export interface Middleware<ContextType extends object | undefined = any> {
   stage?: MiddlewareStage
 }
 
-export type ActionType<InputType extends z.ZodTypeAny, RType = void> = (
-  input: z.infer<InputType>
-) => Promise<RType>
+export type ActionType<
+  InputType extends z.ZodTypeAny,
+  ContextType extends object | undefined = any,
+  RType = void
+> = (input: z.infer<InputType>, context: ContextType) => Promise<RType>
 
-export class ZactApp<ContextType extends object | undefined = any> {
+export class Exzact<ContextType extends object | undefined = any> {
   private preware: Middleware<ContextType>[] = []
   private middleware: Middleware<ContextType>[] = []
   private postware: Middleware<ContextType>[] = []
+
+  private defaultContext: ContextType
+
+  constructor(defaultContext: ContextType) {
+    this.defaultContext = defaultContext
+  }
 
   use(...mw: Middleware<ContextType>[]) {
     for (const m of mw) {
@@ -84,7 +94,10 @@ export class ZactApp<ContextType extends object | undefined = any> {
     })
   }
 
-  zact<InputType extends z.ZodTypeAny>(validator?: InputType) {
+  zact<InputType extends z.ZodTypeAny>(
+    validator?: InputType,
+    defaultContext: ContextType = {} as ContextType
+  ) {
     const invokeMiddleware = this.invokeMiddleware.bind(this)
     const use = this.use.bind(this)
     const remove = this.remove.bind(this)
@@ -93,11 +106,11 @@ export class ZactApp<ContextType extends object | undefined = any> {
       this.middleware,
       this.postware,
     ]
+    const dfContext = Object.assign({}, this.defaultContext, defaultContext)
 
     // This is the "factory" that is created on call of zact. You pass it a "use server" function and it will validate the input before you call it
     return function <RType = void>(
-      action: ActionType<InputType, RType>,
-      defaultContext: ContextType = {} as ContextType,
+      action: ActionType<InputType, ContextType, RType>,
       ...additional: Middleware<ContextType>[]
     ): ZactAction<InputType, RType> {
       use(...additional)
@@ -107,7 +120,7 @@ export class ZactApp<ContextType extends object | undefined = any> {
         const context: Context<InputType, ContextType> = {
           input,
           validator,
-          ...defaultContext,
+          ...dfContext,
         }
 
         await invokeMiddleware(context, preware)
@@ -124,7 +137,7 @@ export class ZactApp<ContextType extends object | undefined = any> {
 
         await invokeMiddleware(context, middleware)
 
-        const response = await action(input)
+        const response = await action(input, context)
 
         await invokeMiddleware(context, postware)
 

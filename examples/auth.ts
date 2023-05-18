@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-import { zapp } from "../src/exzact"
+import { exzact } from "../src/exzact"
 import { authPreware, keyv } from "./middleware/auth.preware"
 
 interface Context {
@@ -9,19 +9,18 @@ interface Context {
   }
 }
 
-const app = zapp<Context>()
+const app = exzact<Context>()
 
 export const hello = app.zact(z.object({ stuff: z.string().min(1) }))(
-  async ({ stuff }: { stuff: string }) => {
-    console.log(`Hello ${stuff}`)
+  async ({ stuff }, { user }) => {
+    console.log(`Hello ${stuff}, from ${user?.id ?? "anonymous"}`)
   }
 )
 
 export const protectedHello = app.zact(z.object({ stuff: z.string().min(1) }))(
-  async ({ stuff }: { stuff: string }) => {
-    console.log(`[Protected]: Hello ${stuff}`)
+  async ({ stuff }, { user }) => {
+    console.log(`[Protected]: Hello ${stuff}, from ${user?.id ?? "anonymous"}`)
   },
-  {},
   authPreware
 )
 
@@ -42,6 +41,7 @@ async function main() {
     "authJwt",
     JSON.stringify({
       exp: Date.now() + 60 * 1000,
+      userId: "123",
     })
   )
 

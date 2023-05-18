@@ -11,46 +11,56 @@ import "cross-fetch/polyfill"
 
 dotenv.config()
 
-import { zapp } from "../src/exzact"
+import { exzact } from "../src/exzact"
 import { upstashMiddleware } from "./middleware/upstash.middleware"
 import { authPreware, keyv } from "./middleware/auth.preware"
 import { logMiddleware } from "./middleware/log.middleware"
 import { localRateLimitMiddleware } from "./middleware/localRateLimit.middleware"
 
 interface Context {
+  thing?: string
   something?: string
   user?: {
     id: string
   }
 }
 
-const app = zapp<Context>()
+const app = exzact<Context>({
+  thing: "things",
+})
 
 app.use(upstashMiddleware, logMiddleware)
 
-export const hello = app.zact(z.object({ stuff: z.string().min(1) }))(
-  async ({ stuff }: { stuff: string }) => {
-    console.log(`Hello ${stuff}`)
-  },
-  {
-    something: "injected",
-  }
-)
+export const hello = app.zact(z.object({ stuff: z.string().min(1) }), {
+  something: "stuff",
+})(async ({ stuff }, { user, thing, something }) => {
+  console.log(
+    `Hello ${stuff}, you injected ${thing} and ${
+      something ?? "nothing"
+    }, from ${user?.id ?? "anonymous"}`
+  )
+})
 
 export const expensive = app.zact(z.object({ stuff: z.string().min(1) }))(
-  async ({ stuff }: { stuff: string }) => {
-    console.log(`[Expensive]: Hello ${stuff}`)
+  async ({ stuff }, { user, thing, something }) => {
+    console.log(
+      `[Expensive]: Hello ${stuff}, you injected ${thing} and ${
+        something ?? "nothing"
+      }, from ${user?.id ?? "anonymous"}`
+    )
   },
-  {},
   localRateLimitMiddleware
 )
 
 export const protectedHello = app.zact(z.object({ stuff: z.string().min(1) }))(
-  async ({ stuff }: { stuff: string }) => {
-    console.log(`[Protected]: Hello ${stuff}`)
+  async ({ stuff }, { user, thing, something }) => {
+    console.log(
+      `[Protected]: Hello ${stuff}, you injected ${thing} and ${
+        something ?? "nothing"
+      }, from ${user?.id ?? "anonymous"}`
+    )
     upstashMiddleware
   },
-  {},
   authPreware
 )
 
@@ -75,6 +85,7 @@ async function main() {
     console.error(err)
   }
 
+  // Used by authMiddleware to check if the user is authenticated.
   await keyv.set(
     "authJwt",
     JSON.stringify({

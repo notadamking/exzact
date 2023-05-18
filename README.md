@@ -17,13 +17,16 @@ Create simple middleware for zact functions:
 
 ```ts
 import { z } from "zod"
-import { zapp, Middleware } from "exzact"
+import { exzact, Middleware } from "exzact"
 
 interface Context {
+  thing?: string
   something?: string
 }
 
-const app = zapp<Context>()
+const app = exzact<Context>({
+  thing: "things",
+})
 
 const logMiddleware: Middleware = async (context, next) => {
   console.log("Log Middleware (Pre): ", context.input)
@@ -31,14 +34,11 @@ const logMiddleware: Middleware = async (context, next) => {
   console.log("Log Middleware (Post): ", context.input)
 }
 
-export const hello = app.zact(z.object({ stuff: z.string().min(1) }))(
-  async ({ stuff }: { stuff: string }) => {
-    console.log(`Hello ${stuff}`)
-  },
-  {
-    something: "injected",
-  }
-)
+export const hello = app.zact(z.object({ stuff: z.string().min(1) }), {
+  something: "stuff",
+})(async ({ stuff }, { thing, something }) => {
+  console.log(`Hello ${stuff}, you injected ${thing} and ${something}`)
+})
 
 app.use(logMiddleware)
 
@@ -46,6 +46,14 @@ hello({ stuff: "world" })
 ```
 
 In the above example, the logging middleware will run before the action has executed.
+
+The simple example above will log the following:
+
+```
+Log Middleware (Pre):  { input: { stuff: 'world' }, thing: 'things', something: 'stuff' }
+Log Middleware (Post):  { input: { stuff: 'world' }, thing: 'things', something: 'stuff' }
+Hello world, you injected things and stuff
+```
 
 ### Middleware Stages
 
@@ -110,6 +118,8 @@ const upstashMiddleware: Middleware = async (_, next) => {
 app.use(upstashMiddleware)
 ```
 
+For more examples, check out the [Code Examples](https://github.com/notadamking/exzact/tree/master/examples).
+
 ### Development
 
 Install the necessary libraries.
@@ -118,7 +128,13 @@ Install the necessary libraries.
 $ npm install
 ```
 
-Run a complete example of the middleware suite.
+Run a simple example.
+
+```sh
+$ npm run example:simple
+```
+
+Run a complete example of the middleware suite (requires Upstash configuration).
 
 ```sh
 $ npm run example:complete

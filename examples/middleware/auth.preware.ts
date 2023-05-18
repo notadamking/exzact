@@ -12,6 +12,7 @@ interface AuthContext {
 
 interface AuthJwt {
   exp: number
+  userId: string
 }
 
 export const authPreware: Middleware<AuthContext> = async (context, next) => {
@@ -23,12 +24,12 @@ export const authPreware: Middleware<AuthContext> = async (context, next) => {
     if (!decoded.exp || decoded.exp < Date.now() / 1000) {
       throw new Error("Forbidden")
     }
+
+    context.user = {
+      id: decoded.userId,
+    }
   } catch (error) {
     throw new Error("Forbidden")
-  }
-
-  context.user = {
-    id: "123",
   }
 
   await next()
