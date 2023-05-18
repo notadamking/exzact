@@ -1,12 +1,10 @@
 {
   "name": "exzact",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "MIT",
   "module": "dist/index.mjs",
   "main": "dist/index.mjs",
-  "files": [
-    "dist"
-  ],
+  "typings": "dist/index.d.ts",
   "scripts": {
     "lint": "eslint ./src/*.ts*",
     "build": "tsup",
