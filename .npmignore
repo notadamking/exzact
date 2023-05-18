@@ -3,6 +3,8 @@
 !src
 !env.examples
 !eslintrc.js
+!LICENSE
 !package.json
 !pnpm-lock.yaml
+!README.md
 !tsconfig.json
