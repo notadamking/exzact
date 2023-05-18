@@ -1,0 +1,8 @@
+!dist
+!examples
+!src
+!env.examples
+!eslintrc.js
+!package.json
+!pnpm-lock.yaml
+!tsconfig.json

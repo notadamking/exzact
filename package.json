@@ -1,0 +1,38 @@
+{
+  "name": "exzact",
+  "version": "0.0.1",
+  "license": "MIT",
+  "scripts": {
+    "lint": "eslint ./src/*.ts*",
+    "build": "tsup",
+    "prepublish": "pnpm run lint && pnpm run build",
+    "example:auth": "ts-node ./examples/auth.ts",
+    "example:complete": "ts-node ./examples/complete.ts",
+    "example:limit": "ts-node ./examples/limit.ts",
+    "example:simple": "ts-node ./examples/simple.ts",
+    "example:upstash": "ts-node ./examples/upstash.ts"
+  },
+  "dependencies": {
+    "zact": "^0.0.2",
+    "zod": "^3.21.4",
+    "zod-validation-error": "^1.3.0"
+  },
+  "devDependencies": {
+    "@upstash/ratelimit": "^0.4.3",
+    "@upstash/redis": "^1.20.6",
+    "cross-fetch": "^3.1.6",
+    "dotenv": "^16.0.3",
+    "eslint": "^8.40.0",
+    "eslint-config-next": "^13.4.2",
+    "eslint-config-prettier": "^8.8.0",
+    "tsup": "6.7.0",
+    "typescript": "^5.0.4"
+  },
+  "peerDependencies": {
+    "next": "^13.3.0",
+    "react": "^18.2.0"
+  },
+  "optionalDependencies": {
+    "ts-node": "^10.9.1"
+  }
+}
