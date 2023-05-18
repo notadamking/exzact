@@ -4,7 +4,7 @@ import { zapp } from "../src/exzact"
 import { logMiddleware } from "./middleware/log.middleware"
 
 interface Context {
-  stuff: string
+  something?: string
 }
 
 const app = zapp<Context>()
@@ -16,7 +16,7 @@ export const hello = app.zact(z.object({ stuff: z.string().min(1) }))(
     console.log(`Hello ${stuff}`)
   },
   {
-    stuff: "",
+    something: "injected",
   }
 )
 

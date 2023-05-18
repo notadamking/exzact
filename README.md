@@ -16,26 +16,33 @@ $ pnpm install exzact
 Create simple middleware for zact functions:
 
 ```ts
-import { z } from "zod";
-import { zapp, Middleware } from "exzact";
+import { z } from "zod"
+import { zapp, Middleware } from "exzact"
 
-const app = zapp();
+interface Context {
+  something?: string
+}
+
+const app = zapp<Context>()
 
 const logMiddleware: Middleware = async (context, next) => {
-  console.log("Log Middleware (Pre): ", context.input);
-  await next();
-  console.log("Log Middleware (Post): ", context.input);
-};
+  console.log("Log Middleware (Pre): ", context.input)
+  await next()
+  console.log("Log Middleware (Post): ", context.input)
+}
 
-const hello = app.zact(z.object({ stuff: z.string().min(1) }))(
+export const hello = app.zact(z.object({ stuff: z.string().min(1) }))(
   async ({ stuff }: { stuff: string }) => {
-    console.log(`Hello ${stuff}`);
+    console.log(`Hello ${stuff}`)
+  },
+  {
+    something: "injected",
   }
-);
+)
 
-app.use(logMiddleware);
+app.use(logMiddleware)
 
-hello({ stuff: "world" });
+hello({ stuff: "world" })
 ```
 
 In the above example, the logging middleware will run before the action has executed.
@@ -71,9 +78,9 @@ In the above example, the logging middleware will run after the action has execu
 Rate-limiting can easily be added to Zact functions via middleware:
 
 ```ts
-import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
-import { Middleware } from "zact";
+import { Ratelimit } from "@upstash/ratelimit"
+import { Redis } from "@upstash/redis"
+import { Middleware } from "zact"
 
 /* Requires setting the following environment variables:
     * - UPSTASH_REDIS_REST_URL
@@ -82,25 +89,25 @@ import { Middleware } from "zact";
     You can find these in your Upstash console.
 */
 
-const redis = Redis.fromEnv();
+const redis = Redis.fromEnv()
 
 // Create a new ratelimiter, that allows 5 requests per 30 seconds
 const ratelimit = new Ratelimit({
   redis,
   limiter: Ratelimit.fixedWindow(5, "30 s"),
-});
+})
 
 const upstashMiddleware: Middleware = async (_, next) => {
-  const { success } = await ratelimit.limit("all");
+  const { success } = await ratelimit.limit("all")
 
   if (!success) {
-    throw new Error("Unable to process at this time");
+    throw new Error("Unable to process at this time")
   }
 
-  await next();
-};
+  await next()
+}
 
-app.use(upstashMiddleware);
+app.use(upstashMiddleware)
 ```
 
 ### Development

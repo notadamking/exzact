@@ -17,13 +17,23 @@ import { authPreware, keyv } from "./middleware/auth.preware"
 import { logMiddleware } from "./middleware/log.middleware"
 import { localRateLimitMiddleware } from "./middleware/localRateLimit.middleware"
 
-const app = zapp()
+interface Context {
+  something?: string
+  user?: {
+    id: string
+  }
+}
+
+const app = zapp<Context>()
 
 app.use(upstashMiddleware, logMiddleware)
 
 export const hello = app.zact(z.object({ stuff: z.string().min(1) }))(
   async ({ stuff }: { stuff: string }) => {
     console.log(`Hello ${stuff}`)
+  },
+  {
+    something: "injected",
   }
 )
 
