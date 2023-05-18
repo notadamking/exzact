@@ -38,22 +38,24 @@ app.use(logMiddleware);
 hello({ stuff: "world" });
 ```
 
+In the above example, the logging middleware will run before the action has executed.
+
 ### Middleware Stages
 
 Middleware can run during any of the following stages:
 
-- `PRE_VALIDATION`: Before the Zact function Zod validation runs.
-- `PRE_EXECUTION`: Before the validated Zact function runs.
-- `POST_EXECUTION`: After the validated Zact runction runs.
+- `PRE_VALIDATE`: Before the Zact function Zod validation runs.
+- `PRE_EXECUTE`: Before the validated Zact function runs.
+- `POST_EXECUTE`: After the validated Zact runction runs.
 
-Middleware defaults to `PRE_EXECUTION` if no stage is manually set.
+Middleware defaults to `PRE_EXECUTE` if no stage is manually set.
 
 ```ts
 import { MiddlewareStage } from "exzact";
 
 ...
 
-logMiddleware.stage = MiddlewareStage.PRE_EXECUTE;
+logMiddleware.stage = MiddlewareStage.POST_EXECUTE;
 
 ...
 
@@ -61,6 +63,8 @@ app.use(logMiddleware);
 
 hello({ stuff: "world" });
 ```
+
+In the above example, the logging middleware will run after the action has executed.
 
 ### Rate Limiting
 
