@@ -1,7 +1,12 @@
 {
   "name": "exzact",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "MIT",
+  "module": "dist/index.mjs",
+  "main": "dist/index.mjs",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "lint": "eslint ./src/*.ts*",
     "build": "tsup",
@@ -13,7 +18,6 @@
     "example:upstash": "ts-node ./examples/upstash.ts"
   },
   "dependencies": {
-    "zact": "^0.0.2",
     "zod": "^3.21.4",
     "zod-validation-error": "^1.3.0"
   },
@@ -26,11 +30,11 @@
     "eslint-config-next": "^13.4.2",
     "eslint-config-prettier": "^8.8.0",
     "tsup": "6.7.0",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "zact": "^0.0.2"
   },
   "peerDependencies": {
-    "next": "^13.3.0",
-    "react": "^18.2.0"
+    "zact": "^0.0.2"
   },
   "optionalDependencies": {
     "ts-node": "^10.9.1"
